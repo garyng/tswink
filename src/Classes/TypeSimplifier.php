@@ -37,75 +37,82 @@ use TsWink\Exceptions\UnknownTypeException;
 
 class TypeSimplifier
 {
-    /** @var Type */
-    private $type;
+  /** @var Type */
+  private $type;
 
-    public function simplify(Column $column)
-    {
-        $this->type = $column->getType();
+  public function simplify(Column $column)
+  {
+    $this->type = $column->getType();
 
-        if($this->isTypeString()) {
-            return "''";
-        }
-        if($this->isTypeAny()) {
-            return "any";
-        }
-        if($this->isTypeNumber()) {
-            return "0";
-        }
-        if($this->isTypeDecimal()) {
-            return "0.0";
-        }
-        if($this->isBooleanDecimal()) {
-            return "false";
-        }
-
-        throw new UnknownTypeException("Unknown type: {$this->type->getName()}");
+    if ($this->isTypeString()) {
+      return "string";
+    }
+    if ($this->isTypeDate()) {
+      return "Date";
+    }
+    if ($this->isTypeAny()) {
+      return "any";
+    }
+    if ($this->isTypeNumber()) {
+      return "number";
+    }
+    if ($this->isTypeDecimal()) {
+      return "number";
+    }
+    if ($this->isBooleanDecimal()) {
+      return "boolean";
     }
 
-    private function isTypeString()
-    {
-        return $this->type instanceof BinaryType
-            || $this->type instanceof GuidType
-            || $this->type instanceof StringType
-            || $this->type instanceof TextType;
-    }
+    throw new UnknownTypeException("Unknown type: {$this->type->getName()}");
+  }
 
-    private function isTypeAny()
-    {
-        return $this->type instanceof ArrayType
-            || $this->type instanceof DateImmutableType
-            || $this->type instanceof DateIntervalType
-            || $this->type instanceof DateTimeImmutableType
-            || $this->type instanceof DateTimeType
-            || $this->type instanceof DateTimeTzImmutableType
-            || $this->type instanceof DateTimeTzType
-            || $this->type instanceof DateType
-            || $this->type instanceof JsonArrayType
-            || $this->type instanceof JsonType
-            || $this->type instanceof ObjectType
-            || $this->type instanceof SimpleArrayType
-            || $this->type instanceof TimeImmutableType
-            || $this->type instanceof TimeType
-            || $this->type instanceof VarDateTimeImmutableType
-            || $this->type instanceof VarDateTimeType;
-    }
+  private function isTypeString()
+  {
+    return $this->type instanceof BinaryType
+      || $this->type instanceof GuidType
+      || $this->type instanceof StringType
+      || $this->type instanceof TextType;
+  }
 
-    private function isTypeNumber()
-    {
-        return $this->type instanceof BigIntType
-            || $this->type instanceof IntegerType
-            || $this->type instanceof SmallIntType;
-    }
+  private function isTypeDate()
+  {
+    return $this->type instanceof DateImmutableType
+      || $this->type instanceof DateIntervalType
+      || $this->type instanceof DateTimeImmutableType
+      || $this->type instanceof DateTimeType
+      || $this->type instanceof DateTimeTzImmutableType
+      || $this->type instanceof DateTimeTzType
+      || $this->type instanceof DateType
+      || $this->type instanceof TimeImmutableType
+      || $this->type instanceof TimeType
+      || $this->type instanceof VarDateTimeImmutableType
+      || $this->type instanceof VarDateTimeType;
+  }
 
-    private function isTypeDecimal()
-    {
-        return $this->type instanceof DecimalType
-            || $this->type instanceof FloatType;
-    }
+  private function isTypeAny()
+  {
+    return $this->type instanceof ArrayType
+      || $this->type instanceof JsonArrayType
+      || $this->type instanceof JsonType
+      || $this->type instanceof ObjectType
+      || $this->type instanceof SimpleArrayType;
+  }
 
-    private function isBooleanDecimal()
-    {
-        return $this->type instanceof BooleanType ;
-    }
+  private function isTypeNumber()
+  {
+    return $this->type instanceof BigIntType
+      || $this->type instanceof IntegerType
+      || $this->type instanceof SmallIntType;
+  }
+
+  private function isTypeDecimal()
+  {
+    return $this->type instanceof DecimalType
+      || $this->type instanceof FloatType;
+  }
+
+  private function isBooleanDecimal()
+  {
+    return $this->type instanceof BooleanType;
+  }
 }
