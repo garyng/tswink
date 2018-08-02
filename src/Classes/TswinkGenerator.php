@@ -32,6 +32,9 @@ Class TswinkGenerator extends Generator
   /** @var Mustache_Engine */
   private $mustache;
 
+  /** @var array */
+  private $hiddenModels;
+
   public function __construct()
   {
     parent::__construct();
@@ -42,12 +45,13 @@ Class TswinkGenerator extends Generator
     if (function_exists('config')) {
       $this->destination = base_path(config('tswink.ts_classes_destination'));
       $this->defaultValue = config('tswink.add_default_value');
+      $this->hiddenModels =  config('tswink.hidden_models');
     }
 
     $this->mustache = new Mustache_Engine([
       'loader' => new Mustache_Loader_FilesystemLoader(
         dirname(__FILE__) . '/../../templates',
-        ['extension' => '.markdown']
+        ['extension' => '.mustache']
       ),
       'escape' => function($value) {
         return $value;
@@ -61,8 +65,15 @@ Class TswinkGenerator extends Generator
     /** @var Table $table */
     foreach ($this->tables as $table) {
       $this->table = $table;
-      $this->processTable();
+      $isHidden = in_array($this->getTableNameForClassFile(), $this->hiddenModels);
+      if (!$isHidden){
+        $this->processTable();
+      }
     }
+
+    $modelFilterName = 'model-filter.ts';
+    $modelFilterPath = dirname(__FILE__) . "/../../templates/$modelFilterName";
+    copy($modelFilterPath, "$this->destination/$modelFilterName");
   }
 
   private function processTable()

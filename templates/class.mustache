@@ -1,0 +1,21 @@
+import { ModelFilter } from './model-filter';
+
+export class {{name}} extends ModelFilter {
+
+  constructor(
+  {{# fields }}
+    public {{ name }}: {{ type }} = {{ default-value }},
+  {{/ fields }}
+    ) {
+    super();
+  }
+
+  public static create(rawObj: {{name}}): {{name}} {
+    return new {{name}}(
+    {{# fields }}
+        rawObj.{{ name }},
+    {{/ fields }}
+    );
+  }
+
+}
