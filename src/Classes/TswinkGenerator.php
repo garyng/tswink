@@ -29,6 +29,9 @@ Class TswinkGenerator extends Generator
   /** @var boolean */
   private $defaultValue;
 
+  /** @var boolean */
+  private $useCamelCase;
+
   /** @var Mustache_Engine */
   private $mustache;
 
@@ -45,7 +48,8 @@ Class TswinkGenerator extends Generator
     if (function_exists('config')) {
       $this->destination = base_path(config('tswink.ts_classes_destination'));
       $this->defaultValue = config('tswink.add_default_value');
-      $this->hiddenModels =  config('tswink.hidden_models');
+      $this->hiddenModels = config('tswink.hidden_models');
+      $this->useCamelCase = config('tswink.use_camel_case');
     }
 
     $this->mustache = new Mustache_Engine([
@@ -95,7 +99,7 @@ Class TswinkGenerator extends Generator
         $out = [];
         foreach ($this->table->getColumns() as $column){
           $out[] = [
-            'name' => $column->getName(),
+            'name' => $this->useCamelCase ? camel_case($column->getName()) : $column->getName(),
             'type' => $this->getSimplifiedType($column),
             'default-value' => $this->getDefaultValue($column)
           ];
